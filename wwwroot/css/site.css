@@ -1,0 +1,68 @@
+﻿body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.carousel-caption p {
+    font-size: 20px;
+    line-height: 1.4;
+}
+
+
+.carousel-inner .item img[src$=".svg"] {
+    width: 100%;
+}
+
+
+#qrCode {
+    margin: 15px;
+}
+
+
+@media screen and (max-width: 767px) {
+    
+    .carousel-caption {
+        display: none;
+    }
+}
+
+.domain-search-container {
+    margin-top: 10px;
+}
+
+.search-box h2 {
+    font-family: 'Lato', sans-serif;
+}
+
+.domain-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.domain-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+}
+
+.whois-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.whois-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.whois-container::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.whois-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}

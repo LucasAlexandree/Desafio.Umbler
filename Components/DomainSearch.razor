@@ -1,0 +1,411 @@
+@using Desafio.Umbler.Services
+@using Desafio.Umbler.Dtos
+@using Desafio.Umbler.Validators
+@inject IDomainApiService DomainApiService
+
+<style>
+    .domain-search-container {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 40px 0;
+        margin-bottom: 40px;
+        margin-top: 20px;
+        border-radius: 0;
+    }
+
+    .search-box {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+    }
+
+    .search-input-group {
+        display: flex;
+        gap: 15px;
+        align-items: stretch;
+    }
+
+    .search-input {
+        flex: 1;
+        padding: 16px 20px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: #28a745;
+        box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+    }
+
+    .search-button {
+        padding: 16px 40px;
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+        min-width: 160px;
+    }
+
+    .search-button:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
+    }
+
+    .search-button:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+
+    .results-container {
+        margin-top: 30px;
+        animation: fadeIn 0.5s ease-in;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .domain-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        overflow: hidden;
+        margin-bottom: 30px;
+        border: none;
+    }
+
+    .domain-card-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 25px 30px;
+        border: none;
+    }
+
+    .domain-card-header h3 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .domain-card-body {
+        padding: 30px;
+    }
+
+    .info-section {
+        margin-bottom: 30px;
+    }
+
+    .info-section:last-child {
+        margin-bottom: 0;
+    }
+
+    .info-section h4 {
+        color: #333;
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid #f0f0f0;
+    }
+
+    .info-item {
+        display: flex;
+        padding: 15px 0;
+        border-bottom: 1px solid #f5f5f5;
+    }
+
+    .info-item:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        font-weight: 600;
+        color: #666;
+        min-width: 180px;
+        margin-right: 20px;
+    }
+
+    .info-value {
+        color: #333;
+        flex: 1;
+    }
+
+    .info-value code {
+        background: #f8f9fa;
+        padding: 6px 12px;
+        border-radius: 6px;
+        color: #e83e8c;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .whois-container {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        max-height: 500px;
+        overflow-y: auto;
+        border: 1px solid #e9ecef;
+    }
+
+    .whois-pre {
+        margin: 0;
+        font-family: 'Courier New', monospace;
+        font-size: 13px;
+        line-height: 1.6;
+        color: #495057;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+
+    .alert-custom {
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border-left: 4px solid;
+    }
+
+    .alert-danger-custom {
+        background: #fff5f5;
+        border-color: #fc8181;
+        color: #c53030;
+    }
+
+    .loading-spinner {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(255,255,255,0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 0.8s linear infinite;
+        margin-right: 8px;
+        vertical-align: middle;
+    }
+
+    @@keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    @@media (max-width: 768px) {
+        .search-input-group {
+            flex-direction: column;
+        }
+
+        .search-button {
+            width: 100%;
+        }
+
+        .info-item {
+            flex-direction: column;
+        }
+
+        .info-label {
+            min-width: auto;
+            margin-bottom: 8px;
+        }
+    }
+</style>
+
+<div class="domain-search-container">
+    <div class="container">
+        <div class="search-box">
+            <h2 style="color: #333; margin-bottom: 25px; font-weight: 600; font-size: 28px;">
+                Consulta de Domínio
+            </h2>
+            <p style="color: #666; margin-bottom: 25px; font-size: 16px;">
+                Digite o domínio que deseja pesquisar para obter informações de DNS e WHOIS
+            </p>
+            <div class="search-input-group">
+                <input class="search-input" 
+                       type="text" 
+                       placeholder="exemplo: umbler.com"
+                       value="@domainInput"
+                       @oninput="OnDomainInput"
+                       @onkeypress="OnKeyPress"
+                       disabled="@isLoading" />
+                <button type="button" 
+                        class="search-button" 
+                        disabled="@isLoading"
+                        @onclick="SearchDomain">
+                    @if (isLoading)
+                    {
+                        <span class="loading-spinner"></span>
+                        <span>Pesquisando...</span>
+                    }
+                    else
+                    {
+                        <span>🔍 Pesquisar</span>
+                    }
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    @if (showResults)
+    {
+        <div class="results-container">
+            @if (errorMessage != null)
+            {
+                <div class="alert-custom alert-danger-custom">
+                    <strong>⚠️ Erro:</strong> @errorMessage
+                </div>
+            }
+            else if (domainInfo != null)
+            {
+                <div class="domain-card">
+                    <div class="domain-card-header">
+                        <h3>
+                            <span>🌐</span>
+                            <span>Informações do Domínio: @domainInfo.Name</span>
+                        </h3>
+                    </div>
+                    <div class="domain-card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="info-section">
+                                    <h4>📡 Informações DNS</h4>
+                                    @if (!string.IsNullOrEmpty(domainInfo.Ip))
+                                    {
+                                        <div class="info-item">
+                                            <div class="info-label">Endereço IP (A)</div>
+                                            <div class="info-value">
+                                                <code>@domainInfo.Ip</code>
+                                            </div>
+                                        </div>
+                                    }
+                                    @if (!string.IsNullOrEmpty(domainInfo.NameServers))
+                                    {
+                                        <div class="info-item">
+                                            <div class="info-label">Name Servers</div>
+                                            <div class="info-value">
+                                                <code>@domainInfo.NameServers</code>
+                                            </div>
+                                        </div>
+                                    }
+                                    @if (!string.IsNullOrEmpty(domainInfo.HostedAt))
+                                    {
+                                        <div class="info-item">
+                                            <div class="info-label">Hospedado em</div>
+                                            <div class="info-value">
+                                                <strong style="color: #28a745;">@domainInfo.HostedAt</strong>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="info-section">
+                                    <h4>📋 Informações WHOIS</h4>
+                                    @if (!string.IsNullOrEmpty(domainInfo.WhoIs))
+                                    {
+                                        <div class="whois-container">
+                                            <pre class="whois-pre">@domainInfo.WhoIs</pre>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <p style="color: #999; font-style: italic;">
+                                            Informações WHOIS não disponíveis.
+                                        </p>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private string domainInput = string.Empty;
+    private bool isLoading = false;
+    private DomainDto domainInfo;
+    private string errorMessage;
+    private bool showResults = false;
+
+    private void OnDomainInput(ChangeEventArgs e)
+    {
+        domainInput = e.Value?.ToString() ?? string.Empty;
+    }
+
+    private async Task OnKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await SearchDomain();
+        }
+    }
+
+    private async Task SearchDomain()
+    {
+        errorMessage = null;
+        domainInfo = null;
+        showResults = false;
+
+        var normalizedDomain = DomainValidator.Normalize(domainInput);
+
+        if (!DomainValidator.IsValid(normalizedDomain))
+        {
+            errorMessage = "Por favor, informe um domínio válido (ex: exemplo.com)";
+            showResults = true;
+            return;
+        }
+
+        isLoading = true;
+        showResults = true;
+
+        try
+        {
+            domainInfo = await DomainApiService.GetDomainAsync(normalizedDomain);
+            errorMessage = null;
+        }
+        catch (DomainValidationException ex)
+        {
+            errorMessage = ex.Message;
+            domainInfo = null;
+        }
+        catch (DomainNotFoundException ex)
+        {
+            errorMessage = ex.Message;
+            domainInfo = null;
+        }
+        catch (DomainServiceException ex)
+        {
+            errorMessage = ex.Message;
+            domainInfo = null;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Erro ao consultar informações do domínio: " + ex.Message;
+            domainInfo = null;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}

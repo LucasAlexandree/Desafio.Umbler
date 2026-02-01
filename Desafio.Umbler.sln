@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Desafio.Umbler", "Desafio.Umbler.csproj", "{DA69573B-326E-1AEC-8D64-831F76D52A66}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DA69573B-326E-1AEC-8D64-831F76D52A66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA69573B-326E-1AEC-8D64-831F76D52A66}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA69573B-326E-1AEC-8D64-831F76D52A66}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA69573B-326E-1AEC-8D64-831F76D52A66}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5F743EDD-F11A-4A6A-AA13-68FFA111F165}
+	EndGlobalSection
+EndGlobal
